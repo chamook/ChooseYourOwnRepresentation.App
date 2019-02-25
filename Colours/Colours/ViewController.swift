@@ -32,9 +32,11 @@ class ViewController: UIViewController {
     }
     
     private func loadColours() {
-        let url = URL(string: "http://localhost:5000/my-colours")
+        let url = URL(string: "http://localhost:5000/my-colours")!
+        var request = URLRequest(url: url)
+        request.setValue("application/vnd.chamook.mini-colours+json", forHTTPHeaderField: "Accept")
         
-        URLSession.shared.dataTask(with: url!) { [weak self] (data, response, error) in
+        URLSession.shared.dataTask(with: request) { [weak self] (data, response, error) in
             guard error == nil else {
                 print("Error getting colours")
                 return
