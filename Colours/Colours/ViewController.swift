@@ -8,10 +8,30 @@
 
 import UIKit
 
+struct RGB: Decodable {
+    var red: Int
+    var green: Int
+    var blue: Int
+    
+    enum CodingKeys: String, CodingKey {
+        case red = "Red"
+        case green = "Green"
+        case blue = "Blue"
+    }
+}
+
 struct Colour: Decodable {
     var id: String
     var name: String
     var hex: String
+    var rgb: RGB
+    
+    enum CodingKeys: String, CodingKey {
+        case id = "Id"
+        case name = "Name"
+        case hex = "Hex"
+        case rgb = "RGB"
+    }
 }
 
 class ViewController: UIViewController {
@@ -34,7 +54,7 @@ class ViewController: UIViewController {
     private func loadColours() {
         let url = URL(string: "http://localhost:5000/my-colours")!
         var request = URLRequest(url: url)
-        request.setValue("application/vnd.chamook.mini-colours+json", forHTTPHeaderField: "Accept")
+        request.setValue("application/vnd.chamook.api+json; including=id,name,hex,rgb", forHTTPHeaderField: "Accept")
         
         URLSession.shared.dataTask(with: request) { [weak self] (data, response, error) in
             guard error == nil else {
@@ -118,7 +138,9 @@ extension ViewController: UITableViewDataSource {
             cell.backgroundColor = .white
             
             if let label = cell.textLabel {
-                label.text = "\(colours[indexPath.item].name) (\(colours[indexPath.item].hex))"
+                let colour = colours[indexPath.item]
+                label.text = "\(colour.name) (\(colour.hex))"
+                label.textColor = UIColor.init(red: CGFloat(colour.rgb.red), green: CGFloat(colour.rgb.green), blue: CGFloat(colour.rgb.blue), alpha: CGFloat(1))
             }
             
             return cell
